@@ -1165,7 +1165,7 @@ Evalúa su explicación como tutor Feynman:
 
 Responde en español, tono de tutor cercano y directo, máximo 8 líneas totales, sin preámbulo tipo "Claro, aquí está mi evaluación".`;
   try{
-    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(key), {
+    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + encodeURIComponent(key), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1433,7 +1433,7 @@ El usuario eligió: ${chosenLetter || '(no marcó ninguna a tiempo)'}
 
 Explica en español, en máximo 4 líneas muy breves y claras, por qué la opción correcta (${q.correct}) es la correcta y por qué cada una de las otras opciones NO lo es. Sé directo, sin preámbulo, usa un tono de tutor amigable. No repitas el texto completo de las opciones, solo la letra y la razón.`;
   try{
-    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(key), {
+    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + encodeURIComponent(key), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
