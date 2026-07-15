@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="RSTI Study">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <style>
 :root{
@@ -710,6 +710,11 @@ mark{background:rgba(23,233,192,0.28); color:var(--text); border-radius:3px; pad
     <div id="statModuleExtremes" class="extremes-grid"></div>
     <div class="section-label">Insignias</div>
     <div class="ach-grid" id="achGrid"></div>
+
+    <div class="section-label">Créditos</div>
+    <div class="content-card" style="text-align:center; color:var(--text-dim); font-size:12.5px;">
+      Desarrollado por <b style="color:var(--text);">Ing. Luis Angel Díaz Bernal</b>
+    </div>
   </div>
 
 </div>
@@ -812,7 +817,11 @@ function loadState(){
   }catch(e){ return defaultState(); }
 }
 function saveState(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  }catch(e){
+    console.warn('No se pudo guardar el progreso (almacenamiento lleno o bloqueado):', e);
+  }
 }
 function cardOf(id){
   if(!STATE.cards[id]) STATE.cards[id] = {box:0, next:0, seen:0, correct:0, wrong:0};
