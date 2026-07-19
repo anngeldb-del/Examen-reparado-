@@ -427,6 +427,10 @@ mark{background:rgba(23,233,192,0.28); color:var(--text); border-radius:3px; pad
   <button id="installBtn" onclick="triggerInstall()" style="display:none; margin-left:8px; background:var(--accent); color:#04120E; border:none; border-radius:20px; padding:6px 12px; font-size:12px; font-weight:700; white-space:nowrap;">⬇ Instalar</button>
 </div>
 
+<div id="storageWarning" style="display:none; margin:0 18px 0; padding:12px 14px; background:rgba(255,92,122,0.12); border:1px solid var(--danger-dim); border-radius:12px; font-size:12.5px; line-height:1.5; color:var(--text);">
+  ⚠ <b>Tu progreso NO se está guardando en este dispositivo.</b> El navegador está bloqueando el almacenamiento local (modo incógnito, "borrar datos al salir" o un permiso de privacidad bloqueado). Revisa la configuración del navegador/app — mientras esto siga así, cada vez que cierres la app perderás tu avance.
+</div>
+
 <div class="app">
 
   <!-- ===================== HOME ===================== -->
@@ -766,6 +770,23 @@ const BOX_INTERVALS = [0, 1*DAY, 3*DAY, 7*DAY, 16*DAY]; // ms until next review 
 const MASTER_BOX = 3; // box >=3 counts as "dominada"
 const STORAGE_KEY = "rstiStudyState_v1";
 
+/* ---------------- Storage availability check ---------------- */
+function storageWorks(){
+  try{
+    const testKey = "__rsti_storage_test__";
+    localStorage.setItem(testKey, "1");
+    const ok = localStorage.getItem(testKey) === "1";
+    localStorage.removeItem(testKey);
+    return ok;
+  }catch(e){
+    return false;
+  }
+}
+function showStorageWarning(){
+  const el = document.getElementById('storageWarning');
+  if(el) el.style.display = 'block';
+}
+
 const ACHIEVEMENTS = [
   {id:"first_step", icon:"🌱", name:"Primer Paso", desc:"Responde tu primera pregunta"},
   {id:"ten", icon:"🔟", name:"Calentando motores", desc:"Responde 10 preguntas"},
@@ -821,6 +842,7 @@ function saveState(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
   }catch(e){
     console.warn('No se pudo guardar el progreso (almacenamiento lleno o bloqueado):', e);
+    showStorageWarning();
   }
 }
 function cardOf(id){
@@ -1933,6 +1955,7 @@ function shuffle(arr){
 
 /* ---------------- Init ---------------- */
 document.addEventListener('DOMContentLoaded', ()=>{
+  if(!storageWorks()) showStorageWarning();
   touchStreak();
   renderTopbar();
   renderHome();
