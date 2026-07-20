@@ -995,8 +995,20 @@ function seenCount(list){
   return list.filter(q=> STATE.cards[q.id] && STATE.cards[q.id].seen>0).length;
 }
 
+const MAX_BOX = BOX_INTERVALS.length - 1; // 4
+// Avance gradual: sube con cada acierto (box/MAX_BOX), a diferencia de masteredCount()
+// que solo cuenta preguntas totalmente "dominadas" (box >= MASTER_BOX) para logros.
+function progressPct(list){
+  if(!list.length) return 0;
+  const sum = list.reduce((acc,q)=>{
+    const c = STATE.cards[q.id];
+    return acc + (c ? Math.min(c.box, MAX_BOX) : 0);
+  }, 0);
+  return Math.round((sum/(list.length*MAX_BOX))*100);
+}
+
 function overallPct(){
-  return Math.round((masteredCount(QUESTIONS)/QUESTIONS.length)*100);
+  return progressPct(QUESTIONS);
 }
 function modulesCompletedCount(){
   return MODULES.filter(m=>{
@@ -1085,9 +1097,10 @@ function renderHome(){
   grid.innerHTML = '';
   MODULES.forEach(m=>{
     const qs = questionsByModule(m.id);
-    const mPct = qs.length? Math.round((masteredCount(qs)/qs.length)*100) : 0;
+    const mPct = progressPct(qs);
+    const masteredPct = qs.length? Math.round((masteredCount(qs)/qs.length)*100) : 0;
     const circumference2 = 2*Math.PI*18;
-    const done = mPct>=85;
+    const done = masteredPct>=85;
     const card = document.createElement('button');
     card.className = 'module-card';
     card.onclick = ()=>openModule(m.id);
@@ -1765,7 +1778,7 @@ function renderStats(){
   const barsEl = document.getElementById('statModuleBars');
   const modPcts = MODULES.map(m=>{
     const qs = questionsByModule(m.id);
-    const pct = qs.length? Math.round((masteredCount(qs)/qs.length)*100):0;
+    const pct = progressPct(qs);
     return {m, pct};
   });
   barsEl.innerHTML = modPcts.map(({m,pct})=>{
@@ -1827,8 +1840,8 @@ function renderStats(){
     const strongest = withData.reduce((a,b)=>b.pct>a.pct?b:a);
     const weakest = withData.reduce((a,b)=>b.pct<a.pct?b:a);
     extEl.innerHTML = `
-      <div class="ex-box"><div class="ex-ic">💪</div><div class="ex-title">${strongest.m.icon} ${strongest.m.title}</div><div class="ex-pct">${strongest.pct}% dominado</div></div>
-      <div class="ex-box"><div class="ex-ic">🎯</div><div class="ex-title">${weakest.m.icon} ${weakest.m.title}</div><div class="ex-pct">${weakest.pct}% dominado — repasa aquí</div></div>`;
+      <div class="ex-box"><div class="ex-ic">💪</div><div class="ex-title">${strongest.m.icon} ${strongest.m.title}</div><div class="ex-pct">${strongest.pct}% de avance</div></div>
+      <div class="ex-box"><div class="ex-ic">🎯</div><div class="ex-title">${weakest.m.icon} ${weakest.m.title}</div><div class="ex-pct">${weakest.pct}% de avance — repasa aquí</div></div>`;
   } else {
     extEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="es-ic">📊</div>Responde algunas preguntas para ver tus módulos fuerte/débil.</div>`;
   }
